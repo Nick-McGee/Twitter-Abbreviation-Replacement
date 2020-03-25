@@ -1,6 +1,5 @@
 package twitterAbrReplacer;
 
-import javax.imageio.IIOException;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -23,6 +22,7 @@ public class Efficient {
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(csvName));
+            reader.readLine();                                           // read first line to remove column titles
 
             String row;
             while ((row = reader.readLine()) != null) {                  // read until end of file
