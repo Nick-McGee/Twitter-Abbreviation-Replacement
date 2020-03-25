@@ -39,8 +39,9 @@ public class Efficient {
             System.out.println("Error Reading File");
         }
 
-        // If exception is caught, make sure not returning NULL by adding 'none' key value pair
-        csvMap.put("none", "none");
+        // If exception is caught, clear the map and return a null map
+        csvMap.clear();
+        csvMap.put(null, null);
         return csvMap;
     }
 }
