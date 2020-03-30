@@ -12,43 +12,54 @@ public class Efficient {
 
     // Global abbreviations hash map
     static HashMap<String, String> abr = new HashMap<>();
+    // Global number of changes
+    static int changes = 0;
 
     public static void main(String[] args) {
-
-        // TODO: Add timer for cvsToMap pre-processing
+        long preProcStart = System.currentTimeMillis();  // start timer for pre-processing
 
         // Create abr hash map
         abr = csvToMap("abr.csv"); // O(m) Runtime and Storage, where m is number of abbreviations
+
+        long preProcEnd = System.currentTimeMillis();    // end timer for pre-processing
+
         if(abr.containsKey(null)) {
             System.out.println("Program Terminated");
             return;
         }
+        int count = 0;
+        long procStart = 0;
+        long procEnd = 0;
 
-        // TODO: Replace tweetsTemp with a dataset
-        String[] tweetsTemp = {"This is just a test lol",
-                               "Hopefully this works, lol or not"};
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("sxswTweets.csv"));
+            reader.readLine();
+            String row;
 
-        /*
-         * Queue Justification:
-         *  Once a raw tweet is processed, we no longer need it.
-         *  If we kept the raw tweets, at the end of the program we would have O(2n) size of tweets.
-         *  By using queues, we maintain a size of O(n) by removing old tweets.
-         *  This will be more noticeable on very large datasets.
-         */
+            procStart = System.currentTimeMillis();  // start timer for processing
 
-        // TODO: Add timer for dataset to queue pre-processing
-        Queue<String> rawTweets = tweetsToQueue(tweetsTemp);  // queue of raw tweets from dataset
+            // O(n) runtime, where n is the number of tweets.
+            while ((row = reader.readLine()) != null) {                  // read until end of file
+                System.out.println(abrReplace(row));
+                count++;
+            }
 
+            procEnd = System.currentTimeMillis();  // end timer for processing
 
-        Queue<String> modifiedTweets = new LinkedList<>();    // tweets with changed abbreviations
+            // Catch Exceptions
+        } catch(FileNotFoundException e) {
+            System.out.println("Cannot Find sxswTweets.csv");
+            return;
+        } catch (IOException e) {
+            System.out.println("Error Reading File");
+            return;
+        }
 
-        // TODO: Add timer for tweets processing
-        for(int i = 0; i <= rawTweets.size(); i++)
-            modifiedTweets.add(abrReplace(rawTweets.poll()));
+        System.out.println("Number of tweets: " + count);
+        System.out.println("Number of changes: " + changes);
 
-        System.out.println(modifiedTweets.poll());
-        System.out.println(modifiedTweets.poll());
-        System.out.println(modifiedTweets.poll());
+        System.out.println("Pre-processing time: " + (preProcEnd - preProcStart) + "ms");
+        System.out.println("Processing time: " + (procEnd - procStart) + "ms");
     }
 
     /*
@@ -89,22 +100,6 @@ public class Efficient {
     }
 
     /*
-     * Input: An array strings containing tweets
-     * Output: A queue of the tweets
-     * O(n) Runtime and Storage, where n is the number of tweets
-     * TODO: Read from a dataset instead of an array
-     */
-    public static Queue<String> tweetsToQueue(String[] tweets) {
-        Queue<String> tweetQueue = new LinkedList<>();
-
-        // O(n) runtime, where n is the number of tweets
-        for (String tweet: tweets)
-            tweetQueue.add(tweet);
-
-        return tweetQueue;
-    }
-
-    /*
      * Input: An unmodified tweet
      * Return: A tweet with abbreviations replaced with the full meaning
      *  Abbreviations are pulled from the global hashmap abr
@@ -114,9 +109,26 @@ public class Efficient {
         String[] tweetSubstrings = rawTweet.split(" ");  // tweets split on spaces
 
         for(int i = 0; i < tweetSubstrings.length; i++)
-            if (abr.containsKey(tweetSubstrings[i]))                // if a substring is an abbreviation
-                tweetSubstrings[i] = abr.get(tweetSubstrings[i]);   // replace it with the full meaning
-
+            if (abr.containsKey(removePunc(tweetSubstrings[i].toLowerCase()))) {                // if a substring is an abbreviation
+                tweetSubstrings[i] = abr.get(tweetSubstrings[i]);                               // replace it with the full meaning
+                changes++;
+            }
         return String.join(" ", tweetSubstrings);          // combine tweet, adding back in spaces
+    }
+
+    /*
+     * Input: A string
+     * Return: A word stripped of punctuation
+     * O(1) runtime
+     */
+    public static String removePunc(String word) {
+        if(word.length() < 2)
+            return word;
+
+        char lastChar = word.charAt(word.length() - 1);
+        if (lastChar == '!' | lastChar == '.' | lastChar == ',')
+            return word.substring(0, word.length() - 1);
+
+        return word;
     }
 }
