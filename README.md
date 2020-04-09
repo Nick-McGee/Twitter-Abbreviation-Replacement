@@ -6,6 +6,8 @@ Datasets have to be manually changed in the source code. Currently, the sxswTwee
 
 **REQUIREMENTS:** The abr.csv must be a csv file with the each abbreviation in the first column, and the the corresponding full value in the second column. Each row is one entry. The Tweet file reads Tweets line by line.
 
+**LIMITATIONS:** Currently, the brute force algorithm can handle a maximum of 74 abbreviations.
+
 ## Datasets and Analysis
 
 Google Drive link for the following datasets: https://drive.google.com/drive/folders/1st90CGQzMkgR6zIlim5pjmUvvdx3Yewo?usp=sharing. abr.csv not included in Google Drive.
